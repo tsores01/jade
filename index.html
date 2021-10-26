@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Jade Delight</title>
+</head>
+
+<body>
+<script language="javascript">
+
+function MenuItem(name, cost)
+{
+	this.name = name;
+	this.cost=cost;
+}
+
+menuItems = new Array(
+	new MenuItem("Chicken Chop Suey", 4.5),
+	new MenuItem("Sweet and Sour Pork", 6.25),
+	new MenuItem("Shrimp Lo Mein", 5.25),
+	new MenuItem("Moo Shi Chicken", 6.5),
+	new MenuItem("Fried Rice", 2.35)
+);
+
+function makeSelect(name, minRange, maxRange)
+{
+	var t= "";
+	t = "<select name='" + name + "' size='1'>";
+	for (j=minRange; j<=maxRange; j++)
+	   t += "<option>" + j + "</option>";
+	t+= "</select>"; 
+	return t;
+}
+</script>
+
+<h1>Jade Delight</h1>
+<form>
+<p>First Name: <input type="text"  name='fname' /></p>
+<p>Last Name*:  <input type="text"  name='lname' /></p>
+
+<!-- Changed street and city input type to hidden --!>
+<p>Street: <input type="hidden"  name='street' id = "streetn" /></p>
+<p>City: <input type="hidden"  name='city' id = "cityn" /></p>
+<p>Phone*: <input type="text"  name='phone' /></p>
+<p> 
+        <!-- Added onclick function --!>
+	<input type="radio"  name="p_or_d" value = "pickup" checked="checked" onclick="noshowtype()" />Pickup  
+	<input type="radio"  name='p_or_d' value = 'delivery' onclick="showtype()" />
+	Delivery
+</p>
+<table border="0" cellpadding="3">
+  <tr>
+    <th>Select Item</th>
+    <th>Item Name</th>
+    <th>Cost Each</th>
+    <th>Total Cost</th>
+  </tr>
+<script language="javascript">
+
+  var s = "";
+  for (i=0; i< menuItems.length; i++)
+  {
+	  s += "<tr><td>";
+	  s += makeSelect("quan" + i, 0, 10);
+	  s += "</td><td>" + menuItems[i].name + "</td>";
+	  s += "<td> $ " + menuItems[i].cost.toFixed(2) + "</td>";
+	  s += "<td>$<input type='text' name='cost'/></td></tr>";
+  }
+  document.writeln(s);
+</script>
+</table>
+<p>Subtotal: 
+   $<input type="text"  name='subtotal' id="subtotal" />
+</p>
+<p>Mass tax 6.25%:
+  $ <input type="text"  name='tax' id="tax" />
+</p>
+<p>Total: $ <input type="text"  name='total' id="total" />
+</p>
+
+<!-- Added onclick function --!>
+<input type = "submit" value = "Submit Order" onclick="submitprep()"/>
+
+</form>
+
+<script language="javascript">
+
+ function showtype() {
+  streetn.type = "text";
+  cityn.type = "text";
+ }
+
+ function noshowtype() {
+  streetn.type = "hidden";
+  cityn.type = "hidden";
+ }
+
+ function calculateamount(arr) {
+
+  temp = 0;
+
+  for(i = 0; i < 5; i++) {
+   temp += parseFloat(arr[i].value);
+  }
+
+  taxval = temp*0.0625;
+  totalval = temp + taxval;
+
+  currsubt.value = temp.toFixed(2);
+  currta.value = taxval.toFixed(2);
+  currtot.value = totalval.toFixed(2);  
+
+ }
+
+ function autoamount(arr) {
+
+  for (init = 0; init < 5; init++) {
+   arr[init].value = 0;
+  }
+
+ }
+
+  currsubt = document.getElementsByName("subtotal")[0];
+  currta = document.getElementsByName("tax")[0];
+  currtot = document.getElementsByName("total")[0];
+
+  autoarr = document.getElementsByName('cost');
+  autoamount(autoarr);
+
+  /* Adjust prices as they change for each of the 5 orderable items
+   * The following block of code is thus repeated five times per the 5
+   * items which must be tracked as they are inputted
+   */
+
+  chop = document.getElementsByName("quan0")[0];
+   chop.onchange = function(event) {
+    counter = chop.selectedIndex;
+    chopamount = counter*menuItems[0].cost;
+    autoarr[0].value = chopamount.toFixed(2);
+    calculateamount(autoarr);
+   }
+
+  pork = document.getElementsByName("quan1")[0];
+   pork.onchange = function(event) {
+    counter = pork.selectedIndex;
+    porkamount = counter*menuItems[1].cost;
+    autoarr[1].value = porkamount.toFixed(2);
+    calculateamount(autoarr);
+   }
+
+  mein = document.getElementsByName("quan2")[0];
+   mein.onchange = function(event) {
+    counter = mein.selectedIndex;
+    meinamount = counter*menuItems[2].cost;
+    autoarr[2].value = meinamount.toFixed(2);
+    calculateamount(autoarr);
+   }
+
+  moo = document.getElementsByName("quan3")[0];
+   moo.onchange = function(event) {
+    counter = moo.selectedIndex;
+    mooamount = counter*menuItems[3].cost;
+    autoarr[3].value = mooamount.toFixed(2);
+    calculateamount(autoarr);
+   }
+
+  rice = document.getElementsByName("quan4")[0];
+   rice.onchange = function(event) {
+    counter = rice.selectedIndex;
+    riceamount = counter*menuItems[4].cost;
+    autoarr[4].value = riceamount.toFixed(2);
+    calculateamount(autoarr);
+   }
+
+
+ function deliveryt(currh, currm, add, confirmtest) {
+
+  h = currh;
+  m = currm + add;
+
+  if ( m >= 60 ) {
+   ++h;
+   h = h%24;
+  }
+  
+  m = m%60;
+
+  if(m.toString().length == 1) {
+   m = "0" + m;
+  }
+  if(h.toString().length == 1) {
+   h = "0" + h;
+  }
+
+  timearr = new Array(2);
+  timearr[0] = h;
+  timearr[1] = m;
+
+  h = confirmtest;
+  m = confirmtest;
+
+  return timearr;
+ }
+
+ function submitprep() {
+
+  bool = true;
+
+  phonenum = document.getElementsByName("phone")[0].value;
+  surname = document.getElementsByName("lname")[0].value;
+  pickordeli = document.getElementsByName("p_or_d");
+  phonenumlen = phonenum.toString().length;
+
+  day = new Date();
+  hourmin = new Array(2);
+  timetake = 0;
+  
+  if (pickordeli[0].checked == true) {
+   timetake = 15;
+   hourmin = deliveryt(day.getHours(), day.getMinutes(), 15, 0);
+  } else {
+   timetake = 30;
+   hourmin = deliveryt(day.getHours(), day.getMinutes(), 30, 0);
+
+   streetname = document.getElementsByName("street")[0].value;
+   cityname = document.getElementsByName("city")[0].value;
+
+   if (streetname == "") {
+    bool = false;
+    alert("Valid street name is required for delivery");
+   }
+   if (cityname == "") {
+    bool = false;
+    alert("Valid city name is required for delivery");
+   }
+   
+  }
+
+  if (phonenum == "") {
+   bool = false;
+   alert("Valid phone number is required");
+  } else if (phonenumlen != 10) {
+     bool = false;
+     alert("Valid phone number is required");
+  }
+
+  if (surname == "") {
+   bool = false;
+   alert("Surname is required");
+  }
+
+  if (currtot.value == 0) {
+   bool = false;
+   alert("Please order at least one item");
+  }
+
+  if(bool == true) {
+   var newwin = window.open("", "NewWindow", "width=300,height=150");
+   newwin.document.writeln("Your order will be ready at " + hourmin[0] + ":" + hourmin[1] + "<br>");
+   newwin.document.writeln("Your bill is: $" + currtot.value + "<br>");
+   newwin.document.writeln("Your order is appreciated, thank you.");
+  }
+
+ }
+
+</script>
+</body>
+</html>
